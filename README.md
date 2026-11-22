@@ -29,8 +29,19 @@ The addon reads:
 just install
 ```
 
-This copies the addon to `~/.local/share/fcitx5`. Then add the emoji hotkey to
-Quick Phrase's trigger keys, so that it opens Quick Phrase:
+This copies the addon to `~/.local/share/fcitx5`. Or build a .deb, which
+installs to `/usr/share/fcitx5` and pulls in the requirements:
+
+```sh
+just deb
+sudo apt install ./dist/fcitx5-quickphrase-emoji_*_all.deb
+```
+
+Don't keep both: a copy in `~/.local/share/fcitx5` takes precedence over the
+package (`just uninstall` removes it).
+
+Either way, add the emoji hotkey to Quick Phrase's trigger keys, so that it
+opens Quick Phrase:
 
 1. Open the fcitx5 configuration tool, go to Addons, and configure Quick Phrase.
 2. Add `Super+E` to Trigger Key, next to the existing `Super+grave`.
@@ -80,6 +91,8 @@ Install the tools with `sudo apt install lua5.3 lua-unit lua-check`.
 just check            # luacheck, then the tests
 just test -v -p App   # LuaUnit options: list each test, filter by name
 just smoke            # load the addon in a headless fcitx5 and check for Lua errors
+just deb              # build dist/*.deb with scripts/build-deb.sh
+just version v1.0.0   # scripts/version.sh: write VERSION, commit, tag v1.0.0 (needs a clean tree)
 ```
 
 The tests use LuaUnit and run with Lua 5.3, which is the version Debian and

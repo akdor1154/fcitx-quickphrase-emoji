@@ -22,6 +22,14 @@ uninstall dest=(data_home / "fcitx5"):
     rm -f {{ dest }}/addon/emojipicker.conf
     rm -rf {{ dest }}/lua/emojipicker
 
+# Build dist/fcitx5-quickphrase-emoji_<version>_all.deb
+deb:
+    scripts/build-deb.sh
+
+# Set the version, commit and tag, e.g. just version v1.0.0
+version tag:
+    scripts/version.sh {{ quote(tag) }}
+
 # Load the addon in a headless fcitx5 and check for Lua errors
 smoke:
     #!/usr/bin/env bash
