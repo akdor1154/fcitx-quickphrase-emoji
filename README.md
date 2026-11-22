@@ -1,14 +1,12 @@
 # Emoji picker for fcitx5 Quick Phrase
 
-A Lua addon for fcitx5 that adds an emoji mode to Quick Phrase. Press the emoji
-hotkey, type words from an emoji's name or keywords, and pick from the list.
+This is a tiny lua addon that co-opts the Quick Phrase module into an improved emoji picker.
 
-- Each typed word must be the start of a word in the emoji's name or keywords,
-  in any order: `thu up`, `up thumbs` and `like` all find 👍.
-- Names and keywords come from the system's Unicode data, in your locale. With
-  `en_AU`, `thongs` finds 🩴.
-- In emoji mode the built-in Quick Phrase tables and spelling suggestions are
-  hidden. The normal Quick Phrase trigger behaves as before.
+When Quick Phrase is activated by a special hard-coded hotkey (Super+e), this special emoji mode gets triggered.
+
+It matches against the Unicode emoji database (read from your system), and doesn't need special `:desc:` codes.
+
+It's thoroughly vibe-coded but at least I wrote this first paragraph and tried to keep the code size constrained.
 
 ## Requirements
 
@@ -35,39 +33,24 @@ This copies the addon to `~/.local/share/fcitx5`. Then add the emoji hotkey to
 Quick Phrase's trigger keys, so that it opens Quick Phrase:
 
 1. Open the fcitx5 configuration tool, go to Addons, and configure Quick Phrase.
-2. Add `Super+period` to Trigger Key, next to the existing `Super+grave`.
+2. Add `Super+E` to Trigger Key, next to the existing `Super+grave`.
 
-Or stop fcitx5 and edit `~/.config/fcitx5/conf/quickphrase.conf`:
-
-```ini
-[TriggerKey]
-0=Super+grave
-1=Super+period
-```
-
-Restart fcitx5 to load the addon:
-
-```sh
-fcitx5 -r -d
-```
+Restart fcitx5 to load the addon.
 
 ## Use
 
-Press Super+period, type, then choose with the number keys or Space. Enter
-commits what you typed, as in normal Quick Phrase.
+Press Super+E, type, then choose with the number keys or Space.
+
+# Implementation Notes
 
 ## Change the hotkey
 
-Create `~/.config/fcitx5/conf/emojipicker.conf`:
+The hotkey is hardcoded because the lua stuff from fcitx makes it too annoying to make it configurable.
 
-```ini
-TriggerKey=Super+semicolon
-```
-
-Keys use fcitx's names: modifiers `Control`, `Alt`, `Shift` and `Super`, joined
-with `+` to a key name such as `period`, `semicolon`, `e` or `F12`. Put the same
-key in Quick Phrase's trigger keys, then restart fcitx5. Without the file, the
-hotkey is `Super+period`.
+The hotkey is set by `HOTKEY_SYM` and `HOTKEY_STATE` at the top of
+`fcitx5/lua/emojipicker/app.lua`. `HOTKEY_SYM` is the key's keysym, from
+`/usr/include/xkbcommon/xkbcommon-keysyms.h`. `HOTKEY_STATE` is the modifier
+mask, using the values in `fcitx.KeyState`.
 
 ## How the hotkey works
 
@@ -86,17 +69,19 @@ The addon logs at debug level. To see its messages:
 fcitx5 -r --verbose='*=5' 2>&1 | grep emojipicker
 ```
 
-On a successful start it logs the emoji hotkey, then `emojipicker: loaded N
-emoji` and the files it read. Problems, such as missing data files, an unknown
-key name or an unknown setting in the config file, also go to fcitx5's standard
-error.
+On a successful start it logs `emojipicker: loaded N emoji` and the files it
+read. Problems, such as missing data files, also go to fcitx5's standard error.
 
 ## Development
 
+Install the tools with `sudo apt install lua5.3 lua-unit lua-check`.
+
 ```sh
-just check   # luacheck and busted
-just smoke   # load the addon in a headless fcitx5 and check for Lua errors
+just check            # luacheck, then the tests
+just test -v -p App   # LuaUnit options: list each test, filter by name
+just smoke            # load the addon in a headless fcitx5 and check for Lua errors
 ```
 
-The tests run with Lua 5.3, which is the version Debian and Ubuntu's
-fcitx5-module-lua links against.
+The tests use LuaUnit and run with Lua 5.3, which is the version Debian and
+Ubuntu's fcitx5-module-lua links against. Each `test/*_test.lua` file defines
+global `Test*` tables, and `test/run.lua` loads them all.

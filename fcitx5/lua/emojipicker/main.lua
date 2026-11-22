@@ -9,18 +9,11 @@ if lua_dir then
 end
 
 local app = require("emojipicker.app")
-local config = require("emojipicker.config")
 
 -- fcitx.log only shows at debug level, so also write problems to stderr.
 local function report(msg)
     fcitx.log(msg)
     io.stderr:write(msg, "\n")
-end
-
-local config_path = config.path()
-local settings, warnings = config.load(config_path)
-for _, w in ipairs(warnings) do
-    report("emojipicker: " .. config_path .. ": " .. w)
 end
 
 local function system_locale()
@@ -34,7 +27,6 @@ end
 
 local picker = app.new({
     actions = fcitx.QuickPhraseAction,
-    trigger_key = settings.trigger_key,
     locale = system_locale(),
     log = fcitx.log,
     error = report,

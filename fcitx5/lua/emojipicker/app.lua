@@ -12,9 +12,22 @@
 
 local data = require("emojipicker.data")
 local search = require("emojipicker.search")
-local keys = require("emojipicker.keys")
 
 local M = {}
+
+-- The emoji hotkey, Super+E. fcitx normalises a key before watchers see it,
+-- and a letter held with a modifier other than Shift arrives upper case, so
+-- this is keysym E (0x45), not e (0x65). To change the key, look up its keysym
+-- in /usr/include/xkbcommon/xkbcommon-keysyms.h.
+M.HOTKEY_SYM = 0x45
+M.HOTKEY_STATE = 1 << 6 -- fcitx.KeyState.Super
+
+-- Keysyms of the modifier keys themselves: Shift_L to Hyper_R, then
+-- ISO_Level3_Shift, ISO_Level5_Shift, Mode_switch and Num_Lock.
+local function is_modifier(sym)
+    return (sym >= 0xffe1 and sym <= 0xffee) or sym == 0xfe03 or sym == 0xfe11
+        or sym == 0xff7e or sym == 0xff7f
+end
 
 local App = {}
 App.__index = App
@@ -22,7 +35,6 @@ App.__index = App
 --- Create the picker and load the emoji data.
 -- @tparam table opts
 --   actions: fcitx.QuickPhraseAction (required)
---   trigger_key: key string, default "Super+period"
 --   max_results: default 50
 --   locale, emoji_test, cldr_dir: passed to data.load
 --   log: function(string) for information, error: function(string) for errors
@@ -34,14 +46,6 @@ function M.new(opts)
         error = opts.error or opts.log or function() end,
         emoji_mode = false,
     }, App)
-
-    local key, kerr = keys.parse(opts.trigger_key or "Super+period")
-    if key then
-        self.log("emojipicker: emoji hotkey is " .. key.text)
-    else
-        self.error("emojipicker: " .. kerr)
-    end
-    self.key = key
 
     local started = os.clock()
     local list, info = data.load({
@@ -60,11 +64,13 @@ function M.new(opts)
 end
 
 --- Key watcher. Never consumes the key.
+-- Releases and modifier keys are ignored: Quick Phrase lets both through
+-- while it is open, and they must not clear emoji mode mid-search.
 function App:on_key(sym, state, release)
-    if release or keys.is_modifier(sym) then
+    if release or is_modifier(sym) then
         return false
     end
-    self.emoji_mode = self.key ~= nil and keys.matches(self.key, sym, state)
+    self.emoji_mode = sym == M.HOTKEY_SYM and state == M.HOTKEY_STATE
     return false
 end
 

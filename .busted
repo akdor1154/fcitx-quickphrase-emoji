@@ -1,6 +1,0 @@
-return {
-    default = {
-        ROOT = { "spec" },
-        lpath = "fcitx5/lua/?.lua",
-    },
-}

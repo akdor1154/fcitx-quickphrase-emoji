@@ -3,13 +3,13 @@ data_home := env("XDG_DATA_HOME", env("HOME") / ".local/share")
 # Lint and test
 check: lint test
 
-# Run the busted specs
-test:
-    busted
+# Run the tests (pass LuaUnit options, e.g. just test -v -p Search)
+test *args:
+    lua test/run.lua {{ args }}
 
 # Run luacheck
 lint:
-    luacheck fcitx5 spec
+    luacheck fcitx5 test
 
 # Copy the addon into fcitx5's data directory
 install dest=(data_home / "fcitx5"):
