@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ldml>
+	<annotations>
+		<annotation cp="&amp;">ampersand | and</annotation>
+		<annotation cp="&amp;" type="tts">ampersand</annotation>
+		<annotation cp="😀">face | grin | grinning face</annotation>
+		<annotation cp="😀" type="tts">grinning face</annotation>
+		<annotation cp="❤">emotion | heart | love | red</annotation>
+		<annotation cp="❤" type="tts">red heart</annotation>
+		<annotation cp="👍">+1 | good | hand | like | thumb | up | yes</annotation>
+		<annotation cp="👍" type="tts">thumbs up</annotation>
+		<annotation cp="🔥">burn | fire | flame | hot | lit</annotation>
+		<annotation cp="🔥" type="tts">fire</annotation>
+		<annotation cp="🩴">beach | flip flop | sandal | thong sandal</annotation>
+		<annotation cp="🩴" type="tts">thong sandal</annotation>
+		<annotation cp="🚮">litter | litter bin</annotation>
+		<annotation cp="🚮" type="tts">litter in bin sign</annotation>
+		<annotation cp="🫩">bags | tired</annotation>
+		<annotation cp="🫩" type="tts">face with bags under eyes</annotation>
+	</annotations>
+</ldml>
